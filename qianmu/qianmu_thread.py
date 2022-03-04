@@ -8,7 +8,7 @@ from lxml import etree
 import redis
 
 
-# start_url = 'http://www.qianmu.org/ranking/905.htm'
+start_url = 'http://www.qianmu.org/2022USNEWS%E4%B8%96%E7%95%8C%E5%A4%A7%E5%AD%A6%E6%8E%92%E5%90%8D'
 # link_queue = Queue()
 threads = []
 THREADS_NUM = 10
@@ -74,38 +74,38 @@ def sigint_handler(signum, frame):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        start_url = sys.argv[1]
-        # 1.请求入口页面
-        selector = etree.HTML(fetch(start_url))
-        # 2.提取列表页面的链接
-        links = selector.xpath('//div[@id="content"]//tr[position()>1]/td[2]/a/@href')
+    # if len(sys.argv) > 1:
+    #     start_url = sys.argv[1]
+    # 1.请求入口页面
+    selector = etree.HTML(fetch(start_url))
+    # 2.提取列表页面的链接
+    links = selector.xpath('//div[@id="content"]//tr[position()>1]/td[2]/a/@href')
 
-        for link in links:
-            if not link.startswith('http://www.qianmu.org'):
-                link = 'http://www.qianmu.org%s' % link
-            # link_queue.put(link)
-            if r.sadd('qianmu.seen', link):
-                r.rpush('qianmu.queue', link)
-    else:
-        # 启动线程，并将线程对象放入一个列表保存
-        for i in range(THREADS_NUM):
-            t = threading.Thread(target=download, args=(i+1,))
-            t.start()
-            threads.append(t)
+    for link in links:
+        if not link.startswith('http://www.qianmu.org'):
+            link = 'http://www.qianmu.org%s' % link
+        # link_queue.put(link)
+        if r.sadd('qianmu.seen', link):
+            r.rpush('qianmu.queue', link)
+    # else:
+    # 启动线程，并将线程对象放入一个列表保存
+    for i in range(THREADS_NUM):
+        t = threading.Thread(target=download, args=(i+1,))
+        t.start()
+        threads.append(t)
 
-        # 捕捉终端CTRL+c产生的SIGINT信号
-        signal.signal(signal.SIGINT, sigint_handler)
-        # 阻塞队列，直到队列被清空
-        # link_queue.join()
+    # 捕捉终端CTRL+c产生的SIGINT信号
+    signal.signal(signal.SIGINT, sigint_handler)
+    # 阻塞队列，直到队列被清空
+    # link_queue.join()
 
-        # 向队列发送n个None，以通知线程退出
-        # for i in range(THREADS_NUM):
-        #     link_queue.put(None)
+    # 向队列发送n个None，以通知线程退出
+    # for i in range(THREADS_NUM):
+    #     link_queue.put(None)
 
-        # 退出线程
-        for t in threads:
-            t.join()
+    # 退出线程
+    for t in threads:
+        t.join()
 
 
 

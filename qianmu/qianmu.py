@@ -2,7 +2,7 @@ import requests
 from lxml import etree
 
 
-start_url = 'http://www.qianmu.org/ranking/905.htm'
+start_url = 'http://www.qianmu.org/2022USNEWS%E4%B8%96%E7%95%8C%E5%A4%A7%E5%AD%A6%E6%8E%92%E5%90%8D'
 
 
 # 请求下载网页
